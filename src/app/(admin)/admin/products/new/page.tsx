@@ -1,12 +1,12 @@
 'use client'
 
 import { useTransition } from 'react'
-import { UploadDropzone } from '@uploadthing/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 
 import { createProduct } from '@/app/actions/products'
 import type { OurFileRouter } from '@/app/api/uploadthing/core'
+import { UploadDropzone } from '@/lib/uploadthing'
 import { ProductInput, productSchema } from '@/lib/validations/product'
 
 export default function NewProductPage() {

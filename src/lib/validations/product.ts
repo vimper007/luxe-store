@@ -6,7 +6,7 @@ export const productSchema = z.object({
   price: z.coerce.number().min(0, 'Price must be zero or greater'),
   stock: z.coerce.number().int().min(0, 'Stock must be an integer zero or greater'),
   category: z.string().min(1, 'Category is required'),
-  images: z.array(z.string().url()).optional(),
+  images: z.array(z.string().url()).optional().default([]),
 })
 
 export type ProductInput = z.infer<typeof productSchema>
