@@ -5,11 +5,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { createProduct } from '@/app/actions/products'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { ProductInput, productSchema } from '@/lib/validations/product'
 
 export default function NewProductPage() {
@@ -32,16 +27,10 @@ export default function NewProductPage() {
 
   const onSubmit = (values: ProductInput) => {
     startTransition(async () => {
-      const formData = new FormData()
-      formData.append('name', values.name)
-      formData.append('description', values.description)
-      formData.append('price', values.price.toString())
-      formData.append('stock', values.stock.toString())
-      formData.append('category', values.category)
+      const result = await createProduct(values)
 
-      const result = await createProduct(formData)
-      if (result?.error) {
-        alert(result.error)
+      if (!result.success) {
+        alert(result.error || 'Failed to create product')
         return
       }
 
@@ -51,82 +40,113 @@ export default function NewProductPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Create Product</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+    <div className="min-h-screen bg-black/95 text-white flex items-center justify-center px-6 py-12">
+      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-white/5 via-transparent to-purple-500/10 blur-3xl" />
+      <div className="w-full max-w-4xl">
+        <div className="bg-zinc-900/50 border border-zinc-800 p-8 md:p-10 rounded-2xl backdrop-blur shadow-2xl">
+          <div className="mb-8">
+            <h1 className="font-playfair text-3xl md:text-4xl font-semibold tracking-tight">
+              Create New Product
+            </h1>
+            <p className="text-zinc-400 mt-2">
+              Add premium inventory with clear pricing and stock controls.
+            </p>
+          </div>
+
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" placeholder="Product name" {...register('name')} />
+              <label className="text-sm text-zinc-300" htmlFor="name">
+                Name
+              </label>
+              <input
+                id="name"
+                className="w-full rounded-xl border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-white placeholder:text-zinc-500 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
+                placeholder="Luxe Wireless Headphones"
+                {...register('name')}
+              />
               {errors.name && (
-                <p className="text-sm text-red-500">{errors.name.message}</p>
+                <p className="text-sm text-red-400">{errors.name.message}</p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
+              <label className="text-sm text-zinc-300" htmlFor="description">
+                Description
+              </label>
+              <textarea
                 id="description"
-                placeholder="Describe the product"
                 rows={4}
+                className="w-full rounded-xl border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-white placeholder:text-zinc-500 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
+                placeholder="Describe the product and its standout features."
                 {...register('description')}
               />
               {errors.description && (
-                <p className="text-sm text-red-500">{errors.description.message}</p>
+                <p className="text-sm text-red-400">{errors.description.message}</p>
               )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="price">Price</Label>
-                <Input
+                <label className="text-sm text-zinc-300" htmlFor="price">
+                  Price
+                </label>
+                <input
                   id="price"
                   type="number"
                   step="0.01"
                   min="0"
-                  placeholder="0.00"
+                  className="w-full rounded-xl border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-white placeholder:text-zinc-500 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
+                  placeholder="299.00"
                   {...register('price', { valueAsNumber: true })}
                 />
                 {errors.price && (
-                  <p className="text-sm text-red-500">{errors.price.message}</p>
+                  <p className="text-sm text-red-400">{errors.price.message}</p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="stock">Stock</Label>
-                <Input
+                <label className="text-sm text-zinc-300" htmlFor="stock">
+                  Stock
+                </label>
+                <input
                   id="stock"
                   type="number"
                   min="0"
+                  className="w-full rounded-xl border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-white placeholder:text-zinc-500 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
+                  placeholder="50"
                   {...register('stock', { valueAsNumber: true })}
                 />
                 {errors.stock && (
-                  <p className="text-sm text-red-500">{errors.stock.message}</p>
+                  <p className="text-sm text-red-400">{errors.stock.message}</p>
                 )}
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <Input
+              <label className="text-sm text-zinc-300" htmlFor="category">
+                Category
+              </label>
+              <input
                 id="category"
-                placeholder="Category"
+                className="w-full rounded-xl border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-white placeholder:text-zinc-500 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
+                placeholder="Audio"
                 {...register('category')}
               />
               {errors.category && (
-                <p className="text-sm text-red-500">{errors.category.message}</p>
+                <p className="text-sm text-red-400">{errors.category.message}</p>
               )}
             </div>
 
-            <Button type="submit" disabled={isPending}>
+            <button
+              type="submit"
+              disabled={isPending}
+              className="w-full rounded-full bg-white py-6 text-lg font-semibold text-black transition hover:bg-zinc-200 disabled:opacity-60"
+            >
               {isPending ? 'Creating...' : 'Create Product'}
-            </Button>
+            </button>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

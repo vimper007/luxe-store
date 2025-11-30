@@ -4,30 +4,23 @@ import { revalidatePath } from 'next/cache'
 
 import { db } from '@/lib/db'
 import { products } from '@/db/schema'
-import { productSchema } from '@/lib/validations/product'
+import { productSchema, type ProductInput } from '@/lib/validations/product'
 
-export async function createProduct(formData: FormData) {
+export async function createProduct(data: ProductInput) {
   try {
-    const parsed = productSchema.safeParse({
-      name: formData.get('name'),
-      description: formData.get('description'),
-      price: formData.get('price'),
-      stock: formData.get('stock'),
-      category: formData.get('category'),
-    })
-
+    const parsed = productSchema.safeParse(data)
     if (!parsed.success) {
-      return { error: 'Invalid product data' }
+      return { success: false, error: 'Invalid product data' }
     }
 
-    const data = parsed.data
+    const payload = parsed.data
 
     await db.insert(products).values({
-      name: data.name,
-      description: data.description,
-      price: data.price.toString(),
-      stock: data.stock,
-      category: data.category,
+      name: payload.name,
+      description: payload.description,
+      price: payload.price.toString(),
+      stock: payload.stock,
+      category: payload.category,
       images: [],
       isFeatured: false,
     })
@@ -36,6 +29,6 @@ export async function createProduct(formData: FormData) {
     return { success: true }
   } catch (error) {
     console.error('Failed to create product', error)
-    return { error: 'Failed to create product' }
+    return { success: false, error: 'Failed to create product' }
   }
 }
