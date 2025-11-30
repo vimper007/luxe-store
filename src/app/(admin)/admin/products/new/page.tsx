@@ -1,10 +1,12 @@
 'use client'
 
 import { useTransition } from 'react'
-import { useForm } from 'react-hook-form'
+import { UploadDropzone } from '@uploadthing/react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
 
 import { createProduct } from '@/app/actions/products'
+import type { OurFileRouter } from '@/app/api/uploadthing/core'
 import { ProductInput, productSchema } from '@/lib/validations/product'
 
 export default function NewProductPage() {
@@ -13,6 +15,8 @@ export default function NewProductPage() {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<ProductInput>({
     resolver: zodResolver(productSchema),
@@ -22,36 +26,31 @@ export default function NewProductPage() {
       price: 0,
       stock: 0,
       category: '',
+      images: [],
     },
   })
+
+  const images = watch('images') || []
 
   const onSubmit = (values: ProductInput) => {
     startTransition(async () => {
       const result = await createProduct(values)
-
       if (!result.success) {
         alert(result.error || 'Failed to create product')
         return
       }
-
       alert('Product created')
       reset()
     })
   }
 
   return (
-    <div className="min-h-screen bg-black/95 text-white flex items-center justify-center px-6 py-12">
-      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-white/5 via-transparent to-purple-500/10 blur-3xl" />
-      <div className="w-full max-w-4xl">
-        <div className="bg-zinc-900/50 border border-zinc-800 p-8 md:p-10 rounded-2xl backdrop-blur shadow-2xl">
-          <div className="mb-8">
-            <h1 className="font-playfair text-3xl md:text-4xl font-semibold tracking-tight">
-              Create New Product
-            </h1>
-            <p className="text-zinc-400 mt-2">
-              Add premium inventory with clear pricing and stock controls.
-            </p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-b from-black via-zinc-950 to-black text-white">
+      <div className="max-w-4xl mx-auto py-10 px-6">
+        <div className="bg-zinc-900/50 border border-zinc-800 backdrop-blur-xl rounded-xl p-8 shadow-2xl">
+          <h1 className="text-3xl font-playfair font-bold text-white mb-8">
+            Create New Product
+          </h1>
 
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-2">
@@ -60,7 +59,7 @@ export default function NewProductPage() {
               </label>
               <input
                 id="name"
-                className="w-full rounded-xl border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-white placeholder:text-zinc-500 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-white placeholder:text-zinc-500 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
                 placeholder="Luxe Wireless Headphones"
                 {...register('name')}
               />
@@ -76,7 +75,7 @@ export default function NewProductPage() {
               <textarea
                 id="description"
                 rows={4}
-                className="w-full rounded-xl border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-white placeholder:text-zinc-500 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-white placeholder:text-zinc-500 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
                 placeholder="Describe the product and its standout features."
                 {...register('description')}
               />
@@ -95,7 +94,7 @@ export default function NewProductPage() {
                   type="number"
                   step="0.01"
                   min="0"
-                  className="w-full rounded-xl border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-white placeholder:text-zinc-500 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-white placeholder:text-zinc-500 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
                   placeholder="299.00"
                   {...register('price', { valueAsNumber: true })}
                 />
@@ -112,7 +111,7 @@ export default function NewProductPage() {
                   id="stock"
                   type="number"
                   min="0"
-                  className="w-full rounded-xl border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-white placeholder:text-zinc-500 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-white placeholder:text-zinc-500 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
                   placeholder="50"
                   {...register('stock', { valueAsNumber: true })}
                 />
@@ -128,7 +127,7 @@ export default function NewProductPage() {
               </label>
               <input
                 id="category"
-                className="w-full rounded-xl border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-white placeholder:text-zinc-500 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="w-full rounded-lg border border-zinc-800 bg-zinc-950/50 px-4 py-3 text-white placeholder:text-zinc-500 focus:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
                 placeholder="Audio"
                 {...register('category')}
               />
@@ -137,10 +136,39 @@ export default function NewProductPage() {
               )}
             </div>
 
+            <div className="space-y-3">
+              <label className="text-sm text-zinc-300">Images</label>
+              <UploadDropzone<OurFileRouter>
+                endpoint="imageUploader"
+                onClientUploadComplete={(res) => {
+                  const uploaded = res?.map((f) => f.url).filter(Boolean) || []
+                  setValue('images', [...images, ...uploaded], { shouldValidate: true })
+                }}
+                onUploadError={(error) => alert(error.message)}
+                className="ut-upload-area bg-zinc-950/50 border border-dashed border-zinc-800 rounded-xl p-6 text-zinc-300"
+              />
+              {images.length > 0 && (
+                <div className="flex flex-wrap gap-3">
+                  {images.map((url) => (
+                    <div
+                      key={url}
+                      className="h-16 w-16 rounded-lg overflow-hidden border border-zinc-800 bg-zinc-900"
+                    >
+                      <img
+                        src={url}
+                        alt="Uploaded preview"
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <button
               type="submit"
               disabled={isPending}
-              className="w-full rounded-full bg-white py-6 text-lg font-semibold text-black transition hover:bg-zinc-200 disabled:opacity-60"
+              className="w-full rounded-full bg-white py-4 text-lg font-semibold text-black transition hover:bg-zinc-200 disabled:opacity-60"
             >
               {isPending ? 'Creating...' : 'Create Product'}
             </button>

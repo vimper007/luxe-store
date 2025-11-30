@@ -21,7 +21,7 @@ export async function createProduct(data: ProductInput) {
       price: payload.price.toString(),
       stock: payload.stock,
       category: payload.category,
-      images: [],
+      images: payload.images ?? [],
       isFeatured: false,
     })
 
