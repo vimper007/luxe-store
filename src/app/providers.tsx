@@ -1,8 +1,8 @@
-'use client';
+'use client'
 
-import { ClerkProvider } from '@clerk/nextjs';
-import { Provider } from 'react-redux';
-import { store } from '@/lib/redux/store';
+import { ClerkProvider } from '@clerk/nextjs'
+import { Provider } from 'react-redux'
+import { store } from '@/lib/redux/store'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -11,5 +11,5 @@ export function Providers({ children }: { children: React.ReactNode }) {
         {children}
       </Provider>
     </ClerkProvider>
-  );
+  )
 }
