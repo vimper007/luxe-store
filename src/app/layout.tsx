@@ -3,11 +3,7 @@ import { GeistSans } from 'geist/font/sans';
 import { Playfair_Display } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
-
-const geistSans = GeistSans({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
+import { cn } from '@/lib/utils';
 
 const playfair = Playfair_Display({
   variable: '--font-playfair',
@@ -27,7 +23,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${playfair.variable} antialiased`}
+        className={cn(
+          GeistSans.variable,
+          playfair.variable,
+          'antialiased'
+        )}
       >
         <Providers>{children}</Providers>
       </body>
