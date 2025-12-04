@@ -1,10 +1,11 @@
-'use client'
+"use client"
 
 import { useTransition } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { UploadDropzone } from "@uploadthing/react"
 import { useForm } from "react-hook-form"
 
+import { ProductImageUpload } from "@/app/admin/products/new/_components/product-image-upload"
+import { toast } from "@/components/ui/use-toast"
 import { createProduct } from "@/app/actions/products"
 import { ProductInput, productSchema } from "@/lib/validations/product"
 
@@ -14,7 +15,7 @@ export default function NewProductPage() {
     register,
     handleSubmit,
     reset,
-    setValue, 
+    setValue,
     watch,
     formState: { errors },
   } = useForm<ProductInput>({
@@ -35,97 +36,69 @@ export default function NewProductPage() {
     startTransition(async () => {
       const result = await createProduct(values)
       if (!result.success) {
-        alert(result.error || "Failed to create product")
+        toast({
+          title: "Product creation failed",
+          description: result.error || "Unable to create product right now.",
+          variant: "destructive",
+        })
         return
       }
-      alert("Product created")
+      toast({ title: "Product created", description: "Your product is now live." })
       reset()
     })
   }
 
-  const handleRemoveImage = (url: string) => {
-    const nextImages = images.filter((img) => img !== url)
-    setValue("images", nextImages, { shouldValidate: true })
-  }
-
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-black text-white">
       <div className="max-w-6xl mx-auto py-10 px-4 lg:px-8">
-        <h1 className="text-2xl font-semibold mb-6 font-playfair">Create New Product</h1>
+        <h1 className="text-2xl font-semibold mb-6 font-playfair text-white">Create New Product</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Media Column */}
           <div className="lg:col-span-4">
-            <div className="rounded-3xl border border-border bg-card p-4">
-              <UploadDropzone
-                endpoint="imageUploader"
-                onClientUploadComplete={(res) => {
-                  const uploaded = res?.map((f) => f.url).filter(Boolean) || []
-                  setValue("images", [...images, ...uploaded], { shouldValidate: true })
-                }}
-                onUploadError={(error) => alert(error.message)}
-                className="ut-upload-area rounded-2xl border-2 border-dashed border-muted-foreground/25 bg-muted/50 text-muted-foreground"
-              />
-
-              {images.length > 0 && (
-                <div className="mt-4 space-y-3">
-                  {images.map((url) => (
-                    <div
-                      key={url}
-                      className="relative overflow-hidden rounded-2xl border border-border bg-card"
-                    >
-                      <img src={url} alt="Uploaded" className="w-full h-48 object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveImage(url)}
-                        className="absolute top-2 right-2 rounded-full bg-background/80 px-3 py-1 text-sm text-foreground shadow"
-                      >
-                        X
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <ProductImageUpload
+              value={images}
+              onChange={(urls) => setValue("images", urls, { shouldValidate: true })}
+            />
           </div>
 
           {/* Form Column */}
           <div className="lg:col-span-8">
-            <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl backdrop-blur-xl">
               <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
                 <div className="space-y-2">
-                  <label className="text-sm text-muted-foreground" htmlFor="name">
+                  <label className="text-sm text-white/70" htmlFor="name">
                     Product Name
                   </label>
                   <input
                     id="name"
-                    className="w-full rounded-xl border border-border bg-background/50 px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-white/20"
+                    className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
                     placeholder="Luxe Wireless Headphones"
                     {...register("name")}
                   />
                   {errors.name && (
-                    <p className="text-sm text-red-500">{errors.name.message}</p>
+                    <p className="text-sm text-red-400">{errors.name.message}</p>
                   )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm text-muted-foreground" htmlFor="category">
+                    <label className="text-sm text-white/70" htmlFor="category">
                       Category
                     </label>
                     <input
                       id="category"
-                      className="w-full rounded-xl border border-border bg-background/50 px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-white/20"
+                      className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
                       placeholder="Audio"
                       {...register("category")}
                     />
                     {errors.category && (
-                      <p className="text-sm text-red-500">{errors.category.message}</p>
+                      <p className="text-sm text-red-400">{errors.category.message}</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm text-muted-foreground" htmlFor="price">
+                    <label className="text-sm text-white/70" htmlFor="price">
                       Price
                     </label>
                     <input
@@ -133,53 +106,53 @@ export default function NewProductPage() {
                       type="number"
                       min="0"
                       step="0.01"
-                      className="w-full rounded-xl border border-border bg-background/50 px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-white/20"
+                      className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
                       placeholder="299.00"
                       {...register("price", { valueAsNumber: true })}
                     />
                     {errors.price && (
-                      <p className="text-sm text-red-500">{errors.price.message}</p>
+                      <p className="text-sm text-red-400">{errors.price.message}</p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm text-muted-foreground" htmlFor="stock">
+                    <label className="text-sm text-white/70" htmlFor="stock">
                       Stock
                     </label>
                     <input
                       id="stock"
                       type="number"
                       min="0"
-                      className="w-full rounded-xl border border-border bg-background/50 px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-white/20"
+                      className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
                       placeholder="50"
                       {...register("stock", { valueAsNumber: true })}
                     />
                     {errors.stock && (
-                      <p className="text-sm text-red-500">{errors.stock.message}</p>
+                      <p className="text-sm text-red-400">{errors.stock.message}</p>
                     )}
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm text-muted-foreground" htmlFor="description">
+                  <label className="text-sm text-white/70" htmlFor="description">
                     Description
                   </label>
                   <textarea
                     id="description"
                     rows={4}
-                    className="w-full rounded-xl border border-border bg-background/50 px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-white/20"
+                    className="w-full rounded-xl border border-white/10 bg-slate-900/70 px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
                     placeholder="Describe the product and its standout features."
                     {...register("description")}
                   />
                   {errors.description && (
-                    <p className="text-sm text-red-500">{errors.description.message}</p>
+                    <p className="text-sm text-red-400">{errors.description.message}</p>
                   )}
                 </div>
 
                 <button
                   type="submit"
                   disabled={isPending}
-                  className="w-full rounded-xl bg-foreground px-4 py-3 text-background font-semibold transition hover:opacity-90 disabled:opacity-60"
+                  className="w-full rounded-xl bg-white px-4 py-3 text-black font-semibold transition hover:bg-white/90 disabled:opacity-60"
                 >
                   {isPending ? "Creating..." : "Create Product"}
                 </button>
