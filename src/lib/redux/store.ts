@@ -1,7 +1,10 @@
-import { configureStore } from '@reduxjs/toolkit'
+import { configureStore } from "@reduxjs/toolkit"
 
-// Temp reducer to init store
-const cartReducer = (state = { items: [] }, action: any) => state
+type CartState = { items: unknown[] }
+
+const initialState: CartState = { items: [] }
+
+const cartReducer = (state: CartState = initialState) => state
 
 export const store = configureStore({
   reducer: {

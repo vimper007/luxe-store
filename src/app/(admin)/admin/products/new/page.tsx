@@ -1,10 +1,11 @@
-'use client'
+"use client"
 
 import { useTransition } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { UploadDropzone } from "@uploadthing/react"
 import { useForm } from "react-hook-form"
 
+import { ProductImageUpload } from "@/app/admin/products/new/_components/product-image-upload"
+import { toast } from "@/components/ui/use-toast"
 import { createProduct } from "@/app/actions/products"
 import { ProductInput, productSchema } from "@/lib/validations/product"
 
@@ -35,17 +36,16 @@ export default function NewProductPage() {
     startTransition(async () => {
       const result = await createProduct(values)
       if (!result.success) {
-        alert(result.error || "Failed to create product")
+        toast({
+          title: "Product creation failed",
+          description: result.error || "Unable to create product right now.",
+          variant: "destructive",
+        })
         return
       }
-      alert("Product created")
+      toast({ title: "Product created", description: "Your product is now live." })
       reset()
     })
-  }
-
-  const handleRemoveImage = (url: string) => {
-    const nextImages = images.filter((img) => img !== url)
-    setValue("images", nextImages, { shouldValidate: true })
   }
 
   return (
@@ -56,37 +56,10 @@ export default function NewProductPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Media Column */}
           <div className="lg:col-span-4">
-            <div className="rounded-3xl border border-border bg-card p-4">
-              <UploadDropzone
-                endpoint="imageUploader"
-                onClientUploadComplete={(res) => {
-                  const uploaded = res?.map((f) => f.url).filter(Boolean) || []
-                  setValue("images", [...images, ...uploaded], { shouldValidate: true })
-                }}
-                onUploadError={(error) => alert(error.message)}
-                className="ut-upload-area rounded-2xl border-2 border-dashed border-muted-foreground/25 bg-muted/50 text-muted-foreground"
-              />
-
-              {images.length > 0 && (
-                <div className="mt-4 space-y-3">
-                  {images.map((url) => (
-                    <div
-                      key={url}
-                      className="relative overflow-hidden rounded-2xl border border-border bg-card"
-                    >
-                      <img src={url} alt="Uploaded" className="w-full h-48 object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveImage(url)}
-                        className="absolute top-2 right-2 rounded-full bg-background/80 px-3 py-1 text-sm text-foreground shadow"
-                      >
-                        X
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <ProductImageUpload
+              value={images}
+              onChange={(urls) => setValue("images", urls, { shouldValidate: true })}
+            />
           </div>
 
           {/* Form Column */}
