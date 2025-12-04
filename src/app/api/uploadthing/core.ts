@@ -4,14 +4,16 @@ import { auth } from "@clerk/nextjs/server"
 const f = createUploadthing()
 
 export const ourFileRouter = {
-  imageUploader: f({ image: { maxFileSize: "4MB", maxFileCount: 5 } })
+  productImage: f({ image: { maxFileSize: "4MB", maxFileCount: 4 } })
     .middleware(async () => {
       const user = await auth()
-      if (!user.userId) throw new Error("Unauthorized")
+      if (!user?.userId) {
+        throw new Error("Unauthorized")
+      }
       return { userId: user.userId }
     })
-    .onUploadComplete(async ({ file }) => {
-      console.log("Upload complete", file.url)
+    .onUploadComplete(async ({ metadata, file }) => {
+      console.log("Upload complete", { metadata, url: file.url })
     }),
 } satisfies FileRouter
 
