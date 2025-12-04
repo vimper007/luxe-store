@@ -38,4 +38,4 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 https://neon.com/docs/guides/nextjs
 https://orm.drizzle.team/docs/get-started-postgresql#neon
 https://docs.uploadthing.com/
-https://docs.uploadthing.com/getting-started/appdir#route-handler
+https://docs.uploadthing.com/getting-started/appdir#route-handler  

@@ -14,7 +14,7 @@ export default function NewProductPage() {
     register,
     handleSubmit,
     reset,
-    setValue,
+    setValue, 
     watch,
     formState: { errors },
   } = useForm<ProductInput>({
