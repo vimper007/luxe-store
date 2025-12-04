@@ -1,3 +1,6 @@
+> Install (run locally):  
+> `npm install next react react-dom typescript @types/node @types/react @types/react-dom tailwindcss postcss autoprefixer class-variance-authority clsx tailwind-merge @radix-ui/react-slot @radix-ui/react-avatar @radix-ui/react-select @radix-ui/react-label @radix-ui/react-dialog @radix-ui/react-popover @radix-ui/react-dropdown-menu @radix-ui/react-separator @radix-ui/react-toast lucide-react framer-motion @reduxjs/toolkit react-redux drizzle-orm drizzle-kit pg @neondatabase/serverless @clerk/nextjs @clerk/themes uploadthing @uploadthing/react uploadthing/next stripe @stripe/stripe-js zod next-themes`
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

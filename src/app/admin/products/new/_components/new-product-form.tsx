@@ -17,6 +17,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { ProductImageUpload } from "./product-image-upload"
+import { createProduct } from "@/server/actions/products"
+import { toast } from "@/components/ui/use-toast"
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -48,9 +50,17 @@ export default function NewProductForm() {
 
   const onSubmit = (values: FormValues) => {
     startTransition(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 500))
-      console.log("Product draft:", values)
-      form.reset(values)
+      const result = await createProduct(values)
+      if (!result.success) {
+        toast({
+          title: "Failed to save",
+          description: result.error ?? "Unable to create product.",
+          variant: "destructive",
+        })
+        return
+      }
+      toast({ title: "Product created", description: "Your product was saved." })
+      form.reset()
     })
   }
 

@@ -1,6 +1,5 @@
 import {
   pgTable,
-  uuid,
   serial,
   text,
   integer,
@@ -11,14 +10,14 @@ import {
 
 export const products = pgTable("products", {
   id: serial("id").primaryKey(),
-  uuid: uuid("uuid").defaultRandom(),
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   description: text("description"),
+  category: text("category").notNull(),
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
   stock: integer("stock").notNull().default(0),
-  category: text("category").notNull(),
-  images: jsonb("images").$type<string[] | null>().default(null),
+  images: jsonb("images").$type<string[]>().default([]),
+  rating: numeric("rating", { precision: 2, scale: 1 }).default("0"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 })

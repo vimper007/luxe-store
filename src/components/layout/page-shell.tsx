@@ -1,23 +1,23 @@
 "use client"
 
-import * as React from "react"
+import { GlassCard } from "./glass-card"
 
 type PageShellProps = {
-  children: React.ReactNode
   title?: string
   subtitle?: string
+  children: React.ReactNode
 }
 
-export function PageShell({ children, title, subtitle }: PageShellProps) {
+export function PageShell({ title, subtitle, children }: PageShellProps) {
   return (
-    <section className="space-y-6">
+    <section className="space-y-4">
       {(title || subtitle) && (
-        <header className="space-y-2">
-          {title && <h1 className="text-3xl font-semibold leading-tight">{title}</h1>}
+        <div className="space-y-1">
+          {title && <h1 className="text-3xl font-semibold">{title}</h1>}
           {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
-        </header>
+        </div>
       )}
-      <div className="glass-panel p-6 md:p-8">{children}</div>
+      <GlassCard className="p-6 md:p-8">{children}</GlassCard>
     </section>
   )
 }
